@@ -44,4 +44,4 @@ jobs:
 
   backend-tests:
     if: ${{ !(github.event.pull_request.merged == false && github.event.action == 'closed') }}
-    uses: .github/workflows/backend_tests.yml
+    uses: ./.github/workflows/backend_tests.yml
