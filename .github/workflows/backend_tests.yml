@@ -1,6 +1,10 @@
 name: Backend Tests Workflow
 
-on: workflow_call
+on:
+  workflow_run:
+    workflows: ["Marketplace workflow"]
+    types:
+      - completed
 
 jobs:
   build:
