@@ -38,3 +38,11 @@ jobs:
           fetch-depth: 0
 
       - run: bash ops/file.sh
+
+      - name: DEPLOY platform
+        if: contains('platform, all', inputs.APPS)
+        run: echo "Platform is being deployed"
+
+      - name: DEPLOY landonline-ui
+        if: contains('landonline-ui, all', inputs.APPS)
+        run: echo "Landnow is being deployed"
