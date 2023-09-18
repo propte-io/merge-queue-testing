@@ -1,0 +1,38 @@
+name: Rollback Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      STAGE:
+        description: 'Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - prod
+        - staging
+        - dev
+      APPs:
+        description: 'App (all apps should be deployed by default)'
+        type: choice
+        options:
+        - landonline-ui
+        - platform
+      TAG:
+        description: 'Tag'
+        required: true
+
+jobs:
+  roll-back:
+    name: Rollback
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+      - name: Code Fetch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.TAG }}
+          fetch-depth: 0
+
+      - run: bash ops/file.sh
