@@ -15,9 +15,9 @@ on:
       APPs:
         description: 'App (all apps should be deployed by default)'
         type: choice
-        default: ''
+        default: 'all'
         options:
-        -
+        - all
         - landonline-ui
         - platform
       TAG:
