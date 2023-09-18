@@ -15,6 +15,7 @@ on:
       APPs:
         description: 'App (all apps should be deployed by default)'
         type: choice
+        default: ''
         options:
         -
         - landonline-ui
