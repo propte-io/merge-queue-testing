@@ -11,6 +11,9 @@ git fetch origin $CURRENT_TAG
 git checkout $CURRENT_TAG
 git status
 
+git tag -l
+git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"
+
 # step 2: get the previous tag
 PREVIOUS_TAG=`git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"`
 echo "PREVIOUS_TAG: $PREVIOUS_TAG"
@@ -19,6 +22,9 @@ echo "PREVIOUS_TAG: $PREVIOUS_TAG"
 git fetch origin $PREVIOUS_TAG
 git checkout $PREVIOUS_TAG
 git status
+
+git tag -l
+git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"
 
 echo "CHECKOUT COMPLETED"
 
