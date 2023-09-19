@@ -31,6 +31,8 @@ git checkout $CURRENT_TAG
 git status
 echo "CHECKOUT COMPLETED"
 
+git checkout main
+
 
 # step 6: get migration scripts
 # MIGRATION_SCRIPTS=`ls -ltr $MIGRATION_SCRIPTS_PATH | awk '$9 > "2023-08-21-User.fullName.ts" {print $9}'`
