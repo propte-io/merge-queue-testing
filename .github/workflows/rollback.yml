@@ -67,7 +67,7 @@ jobs:
             VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 <= version FROM_TAG && version $0 > version TO_TAG {print$1}' | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }'`
             ROLLBACK_DIRECTION=down
           else
-            VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 >= version FROM_TAG && version $0 < version TO_TAG {print$1}'`
+            VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 > version FROM_TAG && version $0 <= version TO_TAG {print$1}'`
             ROLLBACK_DIRECTION=up
           fi
 
