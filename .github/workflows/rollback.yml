@@ -58,26 +58,19 @@ jobs:
       # - name: Install modules
       #   run: yarn install
 
-      - name: Version Preparation
+      - name: Migration
+        if: contains('platform, all', inputs.APPS)
         run: |
           version() { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
           if [ $(version "${{ inputs.FROM_TAG }}") -ge $(version "${{ inputs.TO_TAG }}") ]; then
             VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 <= version FROM_TAG && version $0 > version TO_TAG {print$1}' | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }'`
-            echo "ROLLBACK_DIRECTION=down" >> $GITHUB_ENV
-            echo "VERSIONS=$VERSIONS" >> $GITHUB_ENV
+            ROLLBACK_DIRECTION=down
           else
             VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 >= version FROM_TAG && version $0 < version TO_TAG {print$1}'`
-            echo "ROLLBACK_DIRECTION=down" >> $GITHUB_ENV
-            echo "VERSIONS=$VERSIONS" >> $GITHUB_ENV
+            ROLLBACK_DIRECTION=up
           fi
 
-          echo "ROLLBACK_DIRECTION: $ROLLBACK_DIRECTION"
-          echo "VERSIONS: $VERSIONS"
-
-      - name: Migration
-        if: contains('platform, all', inputs.APPS)
-        run: |
           echo "VERSIONS $VERSIONS"
           echo "ROLLBACK_DIRECTION $ROLLBACK_DIRECTION"
 
