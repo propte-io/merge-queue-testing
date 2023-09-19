@@ -93,9 +93,11 @@ jobs:
       - name: Migration
         if: contains('platform, all', inputs.APPS)
         run: |
+          echo "VERSIONS $VERSIONS"
+
           for CURRENT_TAG in $VERSIONS
           do
-            ROLLBACK_DIRECTION=$ROLLBACK_DIRECTION CURRENT_TAG=$CURRENT_TAG STAGE=$STAGE bash ops/migrate.sh
+            ROLLBACK_DIRECTION=$ROLLBACK_DIRECTION CURRENT_TAG=$CURRENT_TAG STAGE=$STAGE bash ./ops/migrate.sh
           done
         env:
           ROLLBACK_DIRECTION: ${{ needs.handle-tag.outputs.ROLLBACK_DIRECTION }}
