@@ -76,23 +76,27 @@ jobs:
         with:
           node-version: 16.x
 
-      - name: Cache Fetch
-        uses: actions/cache@v3
-        with:
-          path: |
-            '**/node_modules'
-            .netlify/cache
-          key: ${{ runner.os }}-modules-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Cache Fetch
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       '**/node_modules'
+      #       .netlify/cache
+      #     key: ${{ runner.os }}-modules-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
-      - name: Install modules
-        run: yarn install
+      # - name: Install modules
+      #   run: yarn install
 
       - name: Migration
         if: contains('platform, all', inputs.APPS)
         run: |
           echo "VERSIONS $VERSIONS"
+          echo "ROLLBACK_DIRECTION $ROLLBACK_DIRECTION"
+
+          git tag -l
+          git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"
 
           for CURRENT_TAG in $VERSIONS
           do
