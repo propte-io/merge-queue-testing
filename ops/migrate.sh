@@ -11,20 +11,14 @@ git fetch origin $CURRENT_TAG
 git checkout $CURRENT_TAG
 git status
 
-git tag -l
-git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"
-
 # step 2: get the previous tag
-PREVIOUS_TAG=`git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"`
+PREVIOUS_TAG=`git tag -l | awk -v CURRENT_TAG=$CURRENT_TAG 'version $0 < version CURRENT_TAG {print$1}' | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }' | awk 'NR==1 {print; exit}'`
 echo "PREVIOUS_TAG: $PREVIOUS_TAG"
 
 # step 3: checkout the previous tag
 git fetch origin $PREVIOUS_TAG
 git checkout $PREVIOUS_TAG
 git status
-
-git tag -l
-git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"
 
 echo "CHECKOUT COMPLETED"
 

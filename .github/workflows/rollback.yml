@@ -48,11 +48,11 @@ jobs:
           if [ $(version "${{ inputs.FROM_TAG }}") -ge $(version "${{ inputs.TO_TAG }}") ]; then
             VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 <= version FROM_TAG && version $0 > version TO_TAG {print$1}' | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }'`
             echo "::set-output name=ROLLBACK_DIRECTION::down"
-            echo "::set-output name=VERSIONS::$VERSIONS"
+            echo '::set-output name=VERSIONS::"$VERSIONS"'
           else
             VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 >= version FROM_TAG && version $0 < version TO_TAG {print$1}'`
             echo "::set-output name=ROLLBACK_DIRECTION::up"
-            echo "::set-output name=VERSIONS::$VERSIONS"
+            echo '::set-output name=VERSIONS::"$VERSIONS"'
           fi
 
           echo "ROLLBACK_DIRECTION: $ROLLBACK_DIRECTION"
@@ -94,9 +94,6 @@ jobs:
         run: |
           echo "VERSIONS $VERSIONS"
           echo "ROLLBACK_DIRECTION $ROLLBACK_DIRECTION"
-
-          git tag -l
-          git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"
 
           for CURRENT_TAG in $VERSIONS
           do
