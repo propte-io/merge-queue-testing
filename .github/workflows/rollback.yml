@@ -69,7 +69,6 @@ jobs:
       - name: Code Fetch
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.TO_TAG }}
           fetch-depth: 0
 
       - name: Setup Node
@@ -97,7 +96,7 @@ jobs:
 
           for CURRENT_TAG in $VERSIONS
           do
-            ROLLBACK_DIRECTION=$ROLLBACK_DIRECTION CURRENT_TAG=$CURRENT_TAG STAGE=$STAGE bash ./ops/migrate.sh
+            ROLLBACK_DIRECTION=$ROLLBACK_DIRECTION CURRENT_TAG=$CURRENT_TAG STAGE=$STAGE bash ops/migrate.sh
           done
         env:
           ROLLBACK_DIRECTION: ${{ needs.handle-tag.outputs.ROLLBACK_DIRECTION }}
