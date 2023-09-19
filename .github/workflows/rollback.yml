@@ -12,7 +12,7 @@ on:
         - prod
         - staging
         - dev
-      APPs:
+      APPS:
         description: 'App (all apps should be deployed by default)'
         type: choice
         default: 'all'
@@ -20,12 +20,39 @@ on:
         - all
         - landonline-ui
         - platform
-      TAG:
-        description: 'Tag'
+      FROM_TAG:
+        description: 'From tag'
+        required: true
+      TO_TAG:
+        description: 'To tag'
         required: true
 
 jobs:
+  handle-tag:
+    name: Handle tags
+    runs-on: ubuntu-latest
+    outputs:
+      ROLLBACK_DIRECTION: ${{ steps.get-versions.outputs.ROLLBACK_DIRECTION }}
+      VERSIONS: ${{ steps.get-versions.outputs.VERSIONS }}
+    steps:
+      - name: Get Versions
+        id: get-versions
+        run: |
+          version() { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+          if [ $(version "${{ inputs.FROM_TAG }}") -ge $(version "${{ inputs.TO_TAG }}") ]; then
+            VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 <= version FROM_TAG && version $0 > version TO_TAG {print$1}' | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }'`
+            echo "::set-output name=ROLLBACK_DIRECTION::down"
+            echo "::set-output name=VERSIONS::$VERSIONS"
+          else
+            VERSIONS=`git tag -l | awk -v FROM_TAG=${{ inputs.FROM_TAG }} -v TO_TAG=${{ inputs.TO_TAG }} 'version $0 >= version FROM_TAG && version $0 < version TO_TAG {print$1}'`
+            echo "::set-output name=ROLLBACK_DIRECTION::up"
+            echo "::set-output name=VERSIONS::$VERSIONS"
+          fi
+
   roll-back:
+    environment: ${{ inputs.STAGE }}
+    needs: [handle-tag]
     name: Rollback
     runs-on: ubuntu-latest
     permissions: write-all
@@ -34,15 +61,34 @@ jobs:
       - name: Code Fetch
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.TAG }}
-          fetch-depth: 0
+          ref: ${{ inputs.TO_TAG }}
 
-      - run: bash ops/file.sh
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
 
-      - name: DEPLOY platform
+      - name: Cache Fetch
+        uses: actions/cache@v3
+        with:
+          path: |
+            '**/node_modules'
+            .netlify/cache
+          key: ${{ runner.os }}-modules-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install modules
+        run: yarn install
+
+      - name: Migration
         if: contains('platform, all', inputs.APPS)
-        run: echo "Platform is being deployed"
-
-      - name: DEPLOY landonline-ui
-        if: contains('landonline-ui, all', inputs.APPS)
-        run: echo "Landnow is being deployed"
+        run: |
+          for CURRENT_TAG in $VERSIONS
+          do
+            ROLLBACK_DIRECTION=$ROLLBACK_DIRECTION CURRENT_TAG=$CURRENT_TAG STAGE=$STAGE bash ops/migrate.sh
+          done
+        env:
+          ROLLBACK_DIRECTION: ${{ needs.handle-tag.outputs.ROLLBACK_DIRECTION }}
+          VERSIONS: ${{ needs.handle-tag.outputs.VERSIONS }}
+          STAGE: ${{ inputs.STAGE }}
