@@ -55,6 +55,9 @@ jobs:
             echo "::set-output name=VERSIONS::$VERSIONS"
           fi
 
+          echo "ROLLBACK_DIRECTION: $ROLLBACK_DIRECTION"
+          echo "VERSIONS: $VERSIONS"
+
   roll-back:
     environment: ${{ inputs.STAGE }}
     needs: [handle-tag]
