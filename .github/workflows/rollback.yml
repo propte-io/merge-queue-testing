@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ROLLBACK_DIRECTION: ${{ steps.get-versions.outputs.ROLLBACK_DIRECTION }}
-      VERSIONS: ${{ steps.get-versions.outputs.VERSIONS }}
+      VERSIONS: "${{ steps.get-versions.outputs.VERSIONS }}"
     steps:
       - name: Code Fetch
         uses: actions/checkout@v3

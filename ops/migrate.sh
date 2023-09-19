@@ -8,7 +8,8 @@ MIGRATION_SCRIPTS_PATH="./migrations"
 # step 1: checkout the current tag
 echo "CURRENT_TAG=$CURRENT_TAG"
 git fetch origin $CURRENT_TAG
-git checkout -b $CURRENT_TAG origin/$CURRENT_TAG
+git checkout $CURRENT_TAG
+git status
 
 # step 2: get the previous tag
 PREVIOUS_TAG=`git describe --abbrev=0 --tags --exclude="$(git describe --abbrev=0 --tags)"`
@@ -16,7 +17,8 @@ echo "PREVIOUS_TAG: $PREVIOUS_TAG"
 
 # step 3: checkout the previous tag
 git fetch origin $PREVIOUS_TAG
-git checkout -b $PREVIOUS_TAG origin/$PREVIOUS_TAG
+git checkout $PREVIOUS_TAG
+git status
 
 echo "CHECKOUT COMPLETED"
 
@@ -26,6 +28,7 @@ echo "CHECKOUT COMPLETED"
 
 # step 5: checkout the current tag
 git checkout $CURRENT_TAG
+git status
 echo "CHECKOUT COMPLETED"
 
 
@@ -40,8 +43,8 @@ echo "CHECKOUT COMPLETED"
 # yarn install
 # yarn nx build platform --stage $STAGE
 
-echo "MIGRATION SCRIPTS ARE BEING RUN"
-echo "$MIGRATION_SCRIPTS"
+# echo "MIGRATION SCRIPTS ARE BEING RUN"
+# echo "$MIGRATION_SCRIPTS"
 
 # for MIGRATION_FILE_PATH in $MIGRATION_SCRIPTS
 # do
