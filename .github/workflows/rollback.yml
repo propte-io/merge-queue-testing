@@ -35,6 +35,11 @@ jobs:
       ROLLBACK_DIRECTION: ${{ steps.get-versions.outputs.ROLLBACK_DIRECTION }}
       VERSIONS: ${{ steps.get-versions.outputs.VERSIONS }}
     steps:
+      - name: Code Fetch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Get Versions
         id: get-versions
         run: |
@@ -62,6 +67,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ inputs.TO_TAG }}
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v3
